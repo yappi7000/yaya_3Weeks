@@ -1,0 +1,1764 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>X投稿カレンダー｜v10 FINAL「変わった後の人生」</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;600&family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0c0c0e;--surface:#131316;--card:#18181d;--border:#252530;
+    --gold:#b8954a;--silver:#8a9bb0;--line:#3db87a;--note:#c4922a;
+    --buzz:#c45a5a;--life:#7a6aaa;
+    --text:#ddd8cf;--sub:#8a8478;--dim:#3a3830;
+    --am:#c49a6c;--pm:#6c8caa;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--text);font-family:'Noto Sans JP',sans-serif;font-weight:300;line-height:1.9;}
+
+  header{padding:52px 48px 40px;border-bottom:1px solid var(--border);position:relative;overflow:hidden;}
+  header::after{content:'v10';position:absolute;right:40px;top:50%;transform:translateY(-50%);font-family:'Noto Serif JP',serif;font-size:120px;font-weight:600;color:var(--border);pointer-events:none;}
+  .ey{font-size:10px;letter-spacing:.25em;color:var(--gold);text-transform:uppercase;margin-bottom:14px;}
+  h1{font-family:'Noto Serif JP',serif;font-size:clamp(18px,3vw,26px);font-weight:600;line-height:1.5;margin-bottom:16px;position:relative;z-index:1;}
+  .htags{display:flex;flex-wrap:wrap;gap:8px;position:relative;z-index:1;}
+  .ht{font-size:11px;padding:4px 12px;border:1px solid var(--border);border-radius:2px;color:var(--sub);}
+
+  .fp{padding:40px 48px;border-bottom:1px solid var(--border);background:var(--surface);}
+  .fp-l{font-size:10px;letter-spacing:.2em;color:var(--gold);text-transform:uppercase;margin-bottom:20px;}
+  .fp-box{border:1px solid var(--gold);border-radius:6px;padding:28px 32px;background:rgba(184,149,74,.04);font-size:14px;line-height:2.5;white-space:pre-line;color:var(--text);max-width:640px;}
+  .fp-note{margin-top:14px;font-size:11px;color:var(--sub);}
+
+  .axis{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--border);}
+  .ax{padding:16px 20px;border-right:1px solid var(--border);font-size:11px;color:var(--sub);line-height:1.7;}
+  .ax:last-child{border-right:none;}
+  .ax-l{font-size:10px;letter-spacing:.12em;font-weight:500;margin-bottom:5px;}
+
+  main{padding:0 48px 100px;}
+  .wsec{margin-top:56px;}
+  .whd{display:flex;align-items:center;gap:20px;padding-bottom:18px;margin-bottom:24px;border-bottom:1px solid var(--border);}
+  .wn{font-family:'Noto Serif JP',serif;font-size:52px;font-weight:600;line-height:1;opacity:.22;}
+  .wt{font-family:'Noto Serif JP',serif;font-size:15px;font-weight:600;margin-bottom:3px;}
+  .ws{font-size:11px;color:var(--sub);}
+
+  .dc{margin-bottom:12px;border:1px solid var(--border);border-radius:6px;overflow:hidden;background:var(--card);}
+  .dc.buzz{border-color:rgba(196,90,90,.4);}
+  .dc.life-card{border-color:rgba(122,106,170,.35);}
+  .dh{display:flex;align-items:center;gap:12px;padding:11px 20px;background:var(--surface);border-bottom:1px solid var(--border);flex-wrap:wrap;}
+  .dc.buzz .dh{background:rgba(196,90,90,.06);}
+  .dc.life-card .dh{background:rgba(122,106,170,.06);}
+  .dn{font-size:12px;font-weight:500;letter-spacing:.1em;}
+  .dtopic{font-size:11px;color:var(--gold);}
+  .dcta{margin-left:auto;font-size:10px;padding:3px 10px;border-radius:10px;letter-spacing:.08em;font-weight:500;}
+  .cl{background:rgba(61,184,122,.12);color:var(--line);border:1px solid rgba(61,184,122,.25);}
+  .cn{background:rgba(196,146,42,.12);color:var(--note);border:1px solid rgba(196,146,42,.25);}
+  .c0{background:rgba(138,154,176,.12);color:var(--silver);border:1px solid rgba(138,154,176,.25);}
+  .cb{background:rgba(196,90,90,.15);color:#e08080;border:1px solid rgba(196,90,90,.35);}
+  .clife{background:rgba(122,106,170,.15);color:#c0a0e0;border:1px solid rgba(122,106,170,.35);}
+
+  .posts{display:grid;grid-template-columns:1fr 1fr;}
+  .post{padding:20px 24px;}
+  .post:first-child{border-right:1px solid var(--border);}
+  .post.full{grid-column:1/-1;border-right:none;}
+
+  .pm{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+  .pi{font-size:13px;}
+  .pt{font-size:10px;letter-spacing:.15em;font-weight:500;text-transform:uppercase;}
+  .morning .pt{color:var(--am);}
+  .night .pt{color:var(--pm);}
+
+  .ptag{display:inline-block;margin-bottom:10px;font-size:10px;padding:2px 9px;border-radius:2px;letter-spacing:.08em;font-weight:500;}
+  .tc{background:rgba(180,80,80,.13);color:#d49090;border:1px solid rgba(180,80,80,.28);}
+  .tw{background:rgba(60,160,100,.13);color:#80d4a0;border:1px solid rgba(60,160,100,.28);}
+  .ty{background:rgba(180,140,60,.13);color:#d4b870;border:1px solid rgba(180,140,60,.28);}
+  .tl{background:rgba(122,106,170,.13);color:#c0a0e0;border:1px solid rgba(122,106,170,.28);}
+  .tb{background:rgba(196,90,90,.15);color:#e08080;border:1px solid rgba(196,90,90,.35);}
+  .tv{background:rgba(100,100,140,.13);color:#a0a0c8;border:1px solid rgba(100,100,140,.28);}
+
+  .txt{font-size:13px;line-height:2.3;color:var(--text);white-space:pre-line;}
+  .btxt{font-size:14px;line-height:2.5;color:var(--text);white-space:pre-line;max-width:580px;}
+  .ci{display:inline-block;margin-top:12px;font-size:10px;padding:3px 10px;border-radius:10px;}
+
+  /* 回収後の人生ボックス */
+  .life-after{margin-top:16px;padding:14px 18px;background:rgba(122,106,170,.08);border:1px solid rgba(122,106,170,.25);border-radius:4px;}
+  .la-l{font-size:10px;letter-spacing:.12em;color:#c0a0e0;margin-bottom:5px;font-weight:500;}
+  .la-t{font-size:12px;color:#d0c0f0;line-height:1.9;}
+
+  /* 余韻 */
+  .yoin{margin-top:18px;padding-top:14px;border-top:1px solid var(--border);font-size:12px;color:var(--sub);font-style:italic;}
+
+  footer{border-top:1px solid var(--border);padding:28px 48px;text-align:center;font-size:11px;color:var(--dim);letter-spacing:.1em;}
+
+  @media(max-width:640px){
+    header,main,.fp{padding-left:20px;padding-right:20px;}
+    header::after{display:none;}
+    .axis{grid-template-columns:1fr 1fr;}
+    .ax{border-right:none;border-bottom:1px solid var(--border);}
+    .posts{grid-template-columns:1fr;}
+    .post:first-child{border-right:none;border-bottom:1px solid var(--border);}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="ey">X Post Calendar — v10 FINAL「変わった後の人生」を語る</div>
+  <h1>やや＠大人のエスコート術<br>投稿カレンダー｜1〜3週目</h1>
+  <div class="htags">
+    <span class="ht">変わった後の人生を語る</span>
+    <span class="ht">孤独・自己肯定・50代が楽しくなった話</span>
+    <span class="ht">エスコート術より人生の回収</span>
+    <span class="ht">バズ投稿 週1本</span>
+    <span class="ht">失ったのは○○じゃなく△△だった</span>
+  </div>
+</header>
+
+<div class="fp">
+  <div class="fp-l">📌 固定ポスト（完成版）</div>
+  <div class="fp-box">大人の女性は怒らない。
+ただ静かに去る。
+
+俺は50代になるまで
+その意味がわからなかった。
+
+怒られたことはない。
+責められたこともない。
+
+でも気づいたら
+連絡が来なくなっていた。
+
+エレベーター。
+会計。
+店選び。
+別れ際。
+
+全部そこで、静かに減点されていた。
+
+このアカウントは
+50代でやっと気づいた男の
+失敗記録であり、回収記録です。
+
+30代後半〜50代で
+人間力で勝負したい男へ。
+
+プロフのLINEに登録すると
+1万文字超の極秘エスコート教材を
+今すぐ無料で受け取れます🎁</div>
+  <div class="fp-note">※ プロフ画像キャッチも「大人の女性は怒らない。ただ静かに去る。」に統一推奨。</div>
+</div>
+
+<div class="axis">
+  <div class="ax">
+    <div class="ax-l" style="color:#80d4a0">✅ 変わった後の人生</div>
+    孤独がどう消えたか。自分を好きになれたか。50代がどう楽しくなったか。人生がどう楽になったか。<strong>エスコート術の先の話</strong>を語る。
+  </div>
+  <div class="ax">
+    <div class="ax-l" style="color:#d49090">✅ 失った代償</div>
+    「失ったのは○○じゃない。△△だった。」で感情を動かす。数字・場面・具体的損失で<strong>読者を自分事にする</strong>。
+  </div>
+  <div class="ax">
+    <div class="ax-l" style="color:#e08080">✅ バズ投稿</div>
+    週1本・全幅。スクショ保存される密度。<strong>固定ポストレベル</strong>の言葉を入れる。
+  </div>
+  <div class="ax">
+    <div class="ax-l" style="color:#d4b870">✅ やや人生話</div>
+    老眼・体力・父・職場・孤独・健康診断。<strong>50代の日常</strong>がアカウントに人格を与える。
+  </div>
+</div>
+
+<main>
+
+<!-- ========== 1週目 ========== -->
+<div class="wsec">
+  <div class="whd">
+    <span class="wn" style="color:var(--gold)">01</span>
+    <div>
+      <div class="wt">1週目｜所作と、その先の人生</div>
+      <div class="ws">エレベーター・店選び・会計・スマホ・別れ際の先に何があったか</div>
+    </div>
+  </div>
+
+  <!-- 月 バズ① -->
+  <div class="dc buzz">
+    <div class="dh">
+      <span class="dn">月曜日</span>
+      <span class="dtopic">🔥 バズ①｜脈なしじゃなかった、減点されてただけだった</span>
+      <span class="dcta cb">スクショ保存狙い</span>
+    </div>
+    <div class="posts">
+      <div class="post full">
+        <div class="pm"><span class="pi">🌅</span><span class="pt">朝（全幅）</span></div>
+        <span class="ptag tb">バズ投稿</span>
+        <div class="btxt">大人の女性は怒らない。
+ただ静かに去る。
+
+30代のころは
+「脈なしだったんだな」
+で終わってた。
+
+50代になってわかった。
+
+違う。
+
+脈なしじゃない。
+
+減点され続けてただけだった。
+
+エレベーターで先に降りるたびに。
+「高かったね」と言うたびに。
+2時間、自分の話をするたびに。
+スマホを机に置くたびに。
+
+怒られたことはない。
+責められたこともない。
+
+ただ
+返信のテンポが少し落ちた。
+誘いへの返事に「その日は…」が増えた。
+会うたびに、少し温度が下がった。
+
+そうやって、静かに、減点されてた。
+
+50代でやっと気づいた。
+
+「脈なし」じゃなかった。
+「気づかなかった」だけだった。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 月 夜 -->
+  <div class="dc life-card">
+    <div class="dh">
+      <span class="dn">月曜日</span>
+      <span class="dtopic">変わった後の人生｜孤独が消えた話</span>
+      <span class="dcta clife">人生の回収</span>
+    </div>
+    <div class="posts">
+      <div class="post full night">
+        <div class="pm"><span class="pi">🌙</span><span class="pt">夜</span></div>
+        <span class="ptag tl">変わった後の人生</span>
+        <div class="txt">40代のころ、かなり孤独だった。
+
+人と会ってた。
+話してた。
+笑ってた。
+
+でも家に帰ると
+「誰にも本音を話せてない」
+という感覚がいつもあった。
+
+完璧に見せようとしてたから
+誰も俺の本当の顔を知らなかった。
+
+50代になって、変えた。
+
+弱みを見せた。
+失敗を話した。
+「わからない」を言えるようにした。
+
+そしたら孤独が消えた。
+
+「また会いたい」が増えた。
+「最近どうしてる？」が先に届くようになった。
+「あの話、ずっと考えてた」が来るようになった。
+
+孤独は環境じゃなかった。
+自分の「見せ方」だった。
+
+50代で初めて
+「本音を話せる人間関係」を手に入れた。</div>
+        <div class="life-after">
+          <div class="la-l">▶ 変わった後の人生</div>
+          <div class="la-t">孤独が消えた／「また会いたい」が増えた／「あの話ずっと考えてた」が届くようになった</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 火 -->
+  <div class="dc">
+    <div class="dh">
+      <span class="dn">火曜日</span>
+      <span class="dtopic">成功・回収｜エレベーター5秒が変えた3年</span>
+      <span class="dcta cl">LINE誘導</span>
+    </div>
+    <div class="posts">
+      <div class="post morning">
+        <div class="pm"><span class="pi">🌅</span><span class="pt">朝</span></div>
+        <span class="ptag tw">成功・回収</span>
+        <div class="txt">エレベーターで先に降りるのをやめた。
+
+「開」ボタンを押して待つ。
+たったそれだけ。
+
+変わったのは数字だった。
+
+3回で終わってた関係が
+4・5・6回と続くようになった。
+
+向こうから次の日程を提案してくるようになった。
+
+その先に
+3年続く関係が生まれた。
+
+エスコートは派手な技術じゃない。
+5秒の積み重ねが
+3年を作る。
+
+───
+LINEで詳しく🎁</div>
+        <span class="ci cl">▶ LINE</span>
+        <div class="life-after">
+          <div class="la-l">▶ 変わった後の人生</div>
+          <div class="la-t">3回→3年続く関係が生まれた</div>
+        </div>
+      </div>
+      <div class="post night">
+        <div class="pm"><span class="pi">🌙</span><span class="pt">夜</span></div>
+        <span class="ptag tc">失敗→代償</span>
+        <div class="txt">30代のころ、店選びを全部相手に任せてた。
+
+「なんでもいいよ」
+
+俺は"優しさ"のつもりだった。
+でも実際は
+責任を取るのが面倒だっただけだ。
+
+ある日、女性に言われた。
+
+「やや君、毎回私が決めてない？」
+
+返す言葉がなかった。
+
+その後、誘いへの返事に
+「その日は…」が増えた。
+
+失ったのは次のデートじゃない。
+
+「この人は私のことを考えてくれてる」
+という信頼だった。
+
+「なんでもいい」は優しさじゃなかった。
+丸投げだった。
+
+───
+LINEで🎁</div>
+        <span class="ci cl">▶ LINE</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 水 -->
+  <div class="dc">
+    <div class="dh">
+      <span class="dn">水曜日</span>
+      <span class="dtopic">やや人生話｜健康診断の帰り道</span>
+      <span class="dcta c0">余韻で終わる</span>
+    </div>
+    <div class="posts">
+      <div class="post morning">
+        <div class="pm"><span class="pi">🌅</span><span class="pt">朝</span></div>
+        <span class="ptag tc">失敗→代償</span>
+        <div class="txt">「高かったね」と言った夜、
+会計は2万円だった。
+
+失ったのは2万円じゃない。
+次のデートだった。
+
+その後
+誘いへの返事が
+「その日は…」ばかりになった。
+
+一度も「行こう」とは来なかった。
+
+俺はあの夜
+2時間かけて作った空気を
+一言で値段に変えてた。
+
+「また来よう」の一言が次のデートを作る。
+「高かったね」の一言が次のデートを消す。
+
+払った金額より
+払った後の一言に
+男の格が出る。
+
+───
+LINEで🎁</div>
+        <span class="ci cl">▶ LINE</span>
+      </div>
+      <div class="post night">
+        <div class="pm"><span class="pi">🌙</span><span class="pt">夜</span></div>
+        <span class="ptag ty">やや人生話</span>
+        <div class="txt">今日、健康診断に行ってきた。
+
+「要経過観察」が2つ出た。
+
+帰り道、ひとりでコーヒーを飲んだ。
+
+20代のころは気にもしなかった数字が
+50代になると全部が気になる。
+
+でも不思議と焦ってない。
+
+「経過を観察する」って
+人生そのものだな、と思った。
+
+焦って動くより
+ちゃんと見続ける方がいい。
+
+恋愛も、健康も、仕事も
+全部同じかもしれない。
+
+観察できる男が
+変われる男だ。</div>
+        <div class="yoin">50代、まだ間に合う。体も、在り方も。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 木 -->
+  <div class="dc life-card">
+    <div class="dh">
+      <span class="dn">木曜日</span>
+      <span class="dtopic">変わった後の人生｜自分を好きになれた日</span>
+      <span class="dcta clife">人生の回収</span>
+    </div>
+    <div class="posts">
+      <div class="post morning">
+        <div class="pm"><span class="pi">🌅</span><span class="pt">朝</span></div>
+        <span class="ptag tl">変わった後の人生</span>
+        <div class="txt">40代まで、俺は自分があまり好きじゃなかった。
+
+「もっと稼いでたら」
+「もっといいポジションだったら」
+「もっと若かったら」
+
+常にどこかで「足りない」と思ってた。
+
+その「足りなさ」が
+態度ににじみ出てた。
+
+女性に見透かされてた。
+
+50代で変えた。
+
+「今の俺で十分だ」を決めた。
+
+そしたら変わった。
+
+女性との会話で
+緊張しなくなった。
+
+「また会いたい」が向こうから来るようになった。
+
+そして初めて気づいた。
+
+「自分を好きでいられる男が
+ 人を好きにさせる」
+
+承認を求めるのをやめた日から
+俺の50代が楽しくなった。
+
+───
+noteで📖</div>
+        <span class="ci cn">▶ note</span>
+        <div class="life-after">
+          <div class="la-l">▶ 変わった後の人生</div>
+          <div class="la-t">緊張しなくなった／承認を求めるのをやめた日から50代が楽しくなった</div>
+        </div>
+      </div>
+      <div class="post night">
+        <div class="pm"><span class="pi">🌙</span><span class="pt">夜</span></div>
+        <span class="ptag tc">失敗→代償</span>
+        <div class="txt">食事中、スマホを机に置いてた。
+
+通知が来るたびにちらっと見てた。
+
+「スマホ、気になる？」
+
+優しい言い方だった。
+でも意味はわかった。
+
+その後
+返信のテンポが変わった。
+2週間後、自然にフェードアウトした。
+
+失ったのはデートの機会じゃない。
+
+「この人といると、ちゃんとそこにいてくれる」
+という安心感だった。
+
+スマホを見るたびに
+「この人より大事なものがある」
+を証明し続けてた。
+
+───
+noteで📖</div>
+        <span class="ci cn">▶ note</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 金 -->
+  <div class="dc">
+    <div class="dh">
+      <span class="dn">金曜日</span>
+      <span class="dtopic">成功・回収｜別れ際を変えたら3回→8回になった</span>
+      <span class="dcta cn">note誘導</span>
+    </div>
+    <div class="posts">
+      <div class="post morning">
+        <div class="pm"><span class="pi">🌅</span><span class="pt">朝</span></div>
+        <span class="ptag tw">成功・回収</span>
+        <div class="txt">「また連絡するね」を封印した。
+
+代わりに言った。
+
+「今日すごく良かった。
+ 前に行きたいって言ってた場所、
+ 来週か再来週で行けそうなら合わせるよ」
+
+変わったのは数字だった。
+
+それまで3回で終わる関係が多かった。
+変えた後は平均8回以上続くようになった。
+
+次の日程がその場で決まるようになった。
+「次はいつ？」が向こうから先に来るようになった。
+
+「また連絡するね」は
+相手の頭の中に何も残さない。
+
+「次の絵」を作れた男だけが
+また会える。
+
+───
+noteで📖</div>
+        <span class="ci cn">▶ note</span>
+        <div class="life-after">
+          <div class="la-l">▶ 変わった後の人生</div>
+          <div class="la-t">3回→平均8回以上続く関係になった／次の日程がその場で決まるようになった</div>
+        </div>
+      </div>
+      <div class="post night">
+        <div class="pm"><span class="pi">🌙</span><span class="pt">夜</span></div>
+        <span class="ptag tc">失敗→代償</span>
+        <div class="txt">ある女性とは
+3回食事して、3回「また連絡するね」で終わった。
+
+4回目はなかった。
+
+失ったのは4回目のデートじゃない。
+
+「また会いたい」と思ってた気持ちを
+一度も言葉にしなかった
+3回分の夜だった。
+
+俺は毎回「また会いたい」と思ってた。
+でも伝えなかった。
+
+伝わってるはずと思ってた。
+伝わってなかった。</div>
+        <div class="yoin">「また連絡するね」で終わった夜が、何回あっただろう。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 土 -->
+  <div class="dc">
+    <div class="dh">
+      <span class="dn">土曜日</span>
+      <span class="dtopic">やや人生話｜父親の背中</span>
+      <span class="dcta c0">余韻で終わる</span>
+    </div>
+    <div class="posts">
+      <div class="post morning">
+        <div class="pm"><span class="pi">🌅</span><span class="pt">朝</span></div>
+        <span class="ptag tl">変わった後の人生</span>
+        <div class="txt">50代になって
+「50代で良かった」と思えるようになった。
+
+20代のころは
+「まだ若い」が全てだった。
+
+30代は「もっと」を追いかけてた。
+
+40代は「足りない」と思い続けてた。
+
+50代で初めて
+「今の俺で戦える」と思えた。
+
+失敗の数。
+傷ついた記憶。
+それでも立った夜。
+
+全部が「深み」になってた。
+
+深みのある男に
+人は近づいてくる。
+
+モテようとするのをやめた50代が
+一番モテてる。
+
+歳を重ねるとは
+こういうことだったのか、と思う。</div>
+      </div>
+      <div class="post night">
+        <div class="pm"><span class="pi">🌙</span><span class="pt">夜</span></div>
+        <span class="ptag ty">やや人生話</span>
+        <div class="txt">最近、父親の介護を考え始めた。
+
+80代になった父が
+少しずつ足腰が弱くなってる。
+
+先日、一緒に病院に行った。
+診察室から出てきた父が
+少し小さく見えた。
+
+あんなに大きかった人が。
+
+帰り道、父の歩くペースに合わせて歩いた。
+
+急かさない。先に行かない。
+ただ隣を歩く。
+
+それだけのことが
+「一緒にいる」ということなんだと思った。
+
+エスコートも同じかもしれない。
+先に行かない。
+ただ隣にいる。</div>
+        <div class="yoin">父の背中が、少し小さくなっていた。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 日 -->
+  <div class="dc">
+    <div class="dh">
+      <span class="dn">日曜日</span>
+      <span class="dtopic">価値観｜1週目の締め</span>
+      <span class="dcta cn">note誘導</span>
+    </div>
+    <div class="posts">
+      <div class="post morning">
+        <div class="pm"><span class="pi">🌅</span><span class="pt">朝</span></div>
+        <span class="ptag tw">成功・回収</span>
+        <div class="txt">【今週の実践課題】
+
+次に誰かと食事するとき
+この一手だけ試してほしい。
+
+「〇〇が好きって言ってたから
+ ここ選んでみた」
+
+たったの一言。
+
+でもこれを続けた結果
+向こうから店を提案してくるようになった。
+3回で終わってた関係が3年続くようになった。
+
+エスコートの先に
+人生が変わる瞬間がある。
+
+今週、やってみてください。</div>
+      </div>
+      <div class="post night">
+        <div class="pm"><span class="pi">🌙</span><span class="pt">夜</span></div>
+        <span class="ptag tv">価値観</span>
+        <div class="txt">このアカウントは
+失敗記録であり、回収記録だ。
+
+でも本当に伝えたいのは
+エスコート術じゃない。
+
+「50代で人生が変わった」
+という話だ。
+
+孤独が消えた。
+自分を好きになれた。
+50代が楽しくなった。
+
+エレベーターの5秒から始まった
+人生の回収の話を
+来週も続けます。
+
+───
+noteで📖</div>
+        <span class="ci cn">▶ note</span>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /week1 -->
+
+
+<!-- ========== 2週目 ========== -->
+<div class="wsec">
+  <div class="whd">
+    <span class="wn" style="color:var(--silver)">02</span>
+    <div>
+      <div class="wt">2週目｜会話術と、その先の人生</div>
+      <div class="ws">聴くことで変わった人間関係・孤独・自己肯定感｜バズ②</div>
+    </div>
+  </div>
+
+  <!-- 月 バズ② -->
+  <div class="dc buzz">
+    <div class="dh">
+      <span class="dn">月曜日</span>
+      <span class="dtopic">🔥 バズ②｜余裕は引き算で作る</span>
+      <span class="dcta cb">スクショ保存狙い</span>
+    </div>
+    <div class="posts">
+      <div class="post full">
+        <div class="pm"><span class="pi">🌅</span><span class="pt">朝（全幅）</span></div>
+        <span class="ptag tb">バズ投稿</span>
+        <div class="btxt">50代になって気づいた。
+
+若いころ「モテる」と思ってた男が
+今は全然モテていない。
+
+逆に
+若いころ地味だった男が
+50代でめちゃくちゃ魅力的になってる。
+
+差は何か。
+
+顔じゃない。年収でもない。
+
+「余裕があるかどうか」
+ただそれだけだった。
+
+余裕のない男がやること。
+・すぐ返信する
+・すぐ会おうとする
+・褒められたくて頑張る
+・沈黙を埋めようとする
+・次の約束をその場で取り付ける
+
+余裕のある男がやること。
+・返信を急がない
+・引ける
+・相手の話を聴ける
+・沈黙を怖がらない
+・手放せる
+
+全部「しないこと」だ。
+
+余裕は足し算で作らない。
+引き算で作る。
+
+引き算を覚えた男に
+女性は近づいてくる。
+
+30代・40代・50代は
+人生で一番引き算ができる年齢だ。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 月 夜 -->
+  <div class="dc life-card">
+    <div class="dh">
+      <span class="dn">月曜日</span>
+      <span class="dtopic">変わった後の人生｜50代が楽しくなった話</span>
+      <span class="dcta clife">人生の回収</span>
+    </div>
+    <div class="posts">
+      <div class="post full night">
+        <div class="pm"><span class="pi">🌙</span><span class="pt">夜</span></div>
+        <span class="ptag tl">変わった後の人生</span>
+        <div class="txt">50代になって
+人生が楽しくなった。
+
+20代・30代・40代は
+常に何かに追われてた。
+
+モテたい。
+認められたい。
+稼ぎたい。
+若く見られたい。
+
+全部「足りない」から来てた。
+
+50代で変えた。
+
+「今の俺で十分だ」を選んだ。
+
+そしたら変わった。
+
+朝起きるのが楽しくなった。
+人に会うのが楽しくなった。
+食事がおいしくなった。
+景色がきれいに見えるようになった。
+
+女性との関係も変わった。
+
+向こうから来るようになった。
+3年続く関係が生まれた。
+
+「足りない」をやめた日から
+全部が変わった。
+
+これが50代の本当の話だと思う。</div>
+        <div class="life-after">
+          <div class="la-l">▶ 変わった後の人生</div>
+          <div class="la-t">朝起きるのが楽しくなった／食事がおいしくなった／景色がきれいに見えるようになった／向こうから来るようになった</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 火 -->
+  <div class="dc">
+    <div class="dh">
+      <span class="dn">火曜日</span>
+      <span class="dtopic">成功・回収｜2秒待ったら3年続いた</span>
+      <span class="dcta cl">LINE誘導</span>
+    </div>
+    <div class="posts">
+      <div class="post morning">
+        <div class="pm"><span class="pi">🌅</span><span class="pt">朝</span></div>
+        <span class="ptag tw">成功・回収</span>
+        <div class="txt">「2秒待つ」を始めた。
+
+相手が話し終わった後
+すぐ返さず、2秒だけ待つ。
+
+変わったのは数字だった。
+
+それまで毎回俺から誘ってた女性から
+「次はいつ会える？」が先に来るようになった。
+
+途切れがちだった関係が3年続くようになった。
+
+「昨日の話ずっと考えてた」が翌日届くようになった。
+
+2秒の余白が
+「この人、ちゃんと俺の話を受け取ってる」になる。
+
+受け取ってくれる人に
+また会いたくなる。
+
+───
+LINEで詳しく🎁</div>
+        <span class="ci cl">▶ LINE</span>
+        <div class="life-after">
+          <div class="la-l">▶ 変わった後の人生</div>
+          <div class="la-t">途切れがちだった関係が3年続いた／「昨日の話ずっと考えてた」が翌日届くようになった</div>
+        </div>
+      </div>
+      <div class="post night">
+        <div class="pm"><span class="pi">🌙</span><span class="pt">夜</span></div>
+        <span class="ptag tc">失敗→代償</span>
+        <div class="txt">30代のころ、俺はずっと自分が喋ってた。
+
+仕事の話、経験談、ちょっとした自慢。
+「面白い男だと思われたい」が全部に透けてた。
+
+ある夜、女性に言われた。
+
+「やや君って、自分の話が多いよね」
+
+その後、3回目のデートが終わった後
+「また行こう」は来なかった。
+
+失ったのは次のデートじゃない。
+
+俺が2時間話している間
+相手のことを何も聞かなかった
+3回分の夜だった。
+
+───
+LINEで🎁</div>
+        <span class="ci cl">▶ LINE</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 水 -->
+  <div class="dc">
+    <div class="dh">
+      <span class="dn">水曜日</span>
+      <span class="dtopic">やや人生話｜老眼と友人の夜</span>
+      <span class="dcta c0">余韻で終わる</span>
+    </div>
+    <div class="posts">
+      <div class="post morning">
+        <div class="pm"><span class="pi">🌅</span><span class="pt">朝</span></div>
+        <span class="ptag tc">失敗→代償</span>
+        <div class="txt">「でもさ」が口癖だった。
+
+相手が何か言うたびに
+「でもさ、こうじゃない？」と返してた。
+
+ある女性が静かに言った。
+
+「なんか、私の話を
+ 全否定されてる気持ちになる」
+
+その後、デートは続いた。
+でも会うたびに相手が話す量が減った。
+
+最後の夜、会話が少なかった。
+
+失ったのは会話の量じゃない。
+「この人に話したい」という
+相手の気持ちだった。
+
+───
+LINEで🎁</div>
+        <span class="ci cl">▶ LINE</span>
+      </div>
+      <div class="post night">
+        <div class="pm"><span class="pi">🌙</span><span class="pt">夜</span></div>
+        <span class="ptag ty">やや人生話</span>
+        <div class="txt">最近、老眼が進んだ。
+
+スマホの文字が読みにくくなって
+無意識に遠ざけてる。
+
+先週、同年代の友人と飯を食った。
+
+「老眼鏡、もう買った？」
+「いや、まだ認めたくなくて」
+「俺もそうだった。でも買ったら楽になったよ」
+
+笑いながら話した。
+
+でも帰り道、少し考えた。
+
+「認めると楽になる」
+
+老眼も、失敗も、衰えも
+全部同じかもしれない。
+
+認めないと
+ずっと不便なまま。
+
+50代、抗わないことを
+少しずつ覚えてる。</div>
+        <div class="yoin">抗えないものと、付き合い方を覚えてきた。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 木 -->
+  <div class="dc life-card">
+    <div class="dh">
+      <span class="dn">木曜日</span>
+      <span class="dtopic">変わった後の人生｜人生が楽になった理由</span>
+      <span class="dcta clife">人生の回収</span>
+    </div>
+    <div class="posts">
+      <div class="post morning">
+        <div class="pm"><span class="pi">🌅</span><span class="pt">朝</span></div>
+        <span class="ptag tl">変わった後の人生</span>
+        <div class="txt">連絡を週1通にした。
+
+怖かった。
+
+「このまま消えるんじゃないか」と。
+
+でも11日後、向こうから来た。
+
+「最近どうしてる？ 会いたいな」
+
+そしてわかった。
+
+「追いかけなくていい関係」
+を初めて手に入れた瞬間だった。
+
+それまでの俺は
+ずっと追いかけてた。
+
+連絡して、誘って、待って。
+それが恋愛だと思ってた。
+
+50代でやっと知った。
+
+向こうから来る関係の方が
+圧倒的に楽だ。
+
+追いかけなくていい。
+焦らなくていい。
+証明しなくていい。
+
+その楽さが「余裕」になる。
+余裕が「また会いたい」を作る。
+
+───
+noteで📖</div>
+        <span class="ci cn">▶ note</span>
+        <div class="life-after">
+          <div class="la-l">▶ 変わった後の人生</div>
+          <div class="la-t">「追いかけなくていい関係」を初めて手に入れた／人生が圧倒的に楽になった</div>
+        </div>
+      </div>
+      <div class="post night">
+        <div class="pm"><span class="pi">🌙</span><span class="pt">夜</span></div>
+        <span class="ptag tc">失敗→代償</span>
+        <div class="txt">気になる女性に毎日LINEを送ってた時期がある。
+
+「おはよう」「今日どうだった？」「おやすみ」
+
+ある日、既読はつくのに返信が来なくなった。
+
+3日後、届いたのは
+「ちょっと忙しくて、ごめんね」の一言だけ。
+
+失ったのは連絡の頻度じゃない。
+
+「この人といると楽」
+という印象だった。
+
+毎日送ってた3ヶ月で失ったものを
+週1通にした1ヶ月で取り戻した。
+
+───
+noteで📖</div>
+        <span class="ci cn">▶ note</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 金 -->
+  <div class="dc">
+    <div class="dh">
+      <span class="dn">金曜日</span>
+      <span class="dtopic">成功・回収｜記憶が関係と人生を変えた</span>
+      <span class="dcta cn">note誘導</span>
+    </div>
+    <div class="posts">
+      <div class="post morning">
+        <div class="pm"><span class="pi">🌅</span><span class="pt">朝</span></div>
+        <span class="ptag tw">成功・回収</span>
+        <div class="txt">1ヶ月前の会話をメモした。
+
+「実家の親の体調が心配で」
+
+次に会ったとき使った。
+
+「お父さん、その後どう？」
+
+その日から関係の質が変わった。
+
+向こうから店を提案してくるようになった。
+「会いたいんだけど今週どう？」が届くようになった。
+
+さらに変わったのは
+俺自身だった。
+
+「人の話を聞ける男になった」
+と思えるようになった。
+
+それまでずっと自分が嫌いだった部分が
+少し好きになれた。
+
+記憶力を鍛えたら
+自己肯定感が上がった。
+
+───
+noteで📖</div>
+        <span class="ci cn">▶ note</span>
+        <div class="life-after">
+          <div class="la-l">▶ 変わった後の人生</div>
+          <div class="la-t">「人の話を聞ける男になった」と思えた／自己肯定感が上がった</div>
+        </div>
+      </div>
+      <div class="post night">
+        <div class="pm"><span class="pi">🌙</span><span class="pt">夜</span></div>
+        <span class="ptag tc">失敗→代償</span>
+        <div class="txt">食事中、女性が話してくれた。
+
+「最近、実家の親の体調が心配で」
+
+俺は「そっか、大変だね」と返して
+そのまま別の話題に変えた。
+
+2週間後、また会ったとき
+「お父さん、その後どう？」
+と聞けなかった。
+
+正確には、忘れてた。
+
+その後、返信のテンポが落ちた。
+
+失ったのはデートの機会じゃない。
+
+「この人は私を見てくれてる」
+という信頼だった。</div>
+        <div class="yoin">記憶は愛情だと、失って気づいた。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 土 -->
+  <div class="dc">
+    <div class="dh">
+      <span class="dn">土曜日</span>
+      <span class="dtopic">成功・回収｜弱みを見せたら孤独が消えた</span>
+      <span class="dcta cn">note誘導</span>
+    </div>
+    <div class="posts">
+      <div class="post morning">
+        <div class="pm"><span class="pi">🌅</span><span class="pt">朝</span></div>
+        <span class="ptag tw">成功・回収</span>
+        <div class="txt">「情けない話なんだけど」と言えた夜がある。
+
+仕事での失敗を正直に話した。
+
+変わったのは関係だけじゃなかった。
+
+翌日「昨日の話ずっと考えてた」が届いた。
+
+その後、「また会いたい」が向こうから来るようになった。
+
+そして俺自身が変わった。
+
+「弱みを話せる自分」を
+初めて好きになれた。
+
+40代まで完璧を演じてた代償は
+「本音を話せる人間関係がない孤独」だった。
+
+50代で弱みを見せた結果
+「本音を話せる人間関係」を手に入れた。
+
+孤独は、鎧を脱ぐことで終わる。
+
+───
+noteで📖</div>
+        <span class="ci cn">▶ note</span>
+        <div class="life-after">
+          <div class="la-l">▶ 変わった後の人生</div>
+          <div class="la-t">「弱みを話せる自分」を初めて好きになれた／孤独が消えた</div>
+        </div>
+      </div>
+      <div class="post night">
+        <div class="pm"><span class="pi">🌙</span><span class="pt">夜</span></div>
+        <span class="ptag tl">変わった後の人生</span>
+        <div class="txt">40代のある時期、かなり孤独だった。
+
+人と会ってた。
+話してた。
+笑ってた。
+
+でも家に帰ると
+「誰にも本音を話せてない」
+という感覚がいつもあった。
+
+完璧に見せようとしてたから
+誰も俺の本当の顔を知らなかった。
+
+50代で弱みを見せた。
+
+そしたら孤独が消えた。
+
+「また会いたい」が増えた。
+「最近どうしてる？」が先に届くようになった。
+
+孤独の原因は
+人の数じゃなかった。
+
+自分の「見せ方」だった。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 日 -->
+  <div class="dc">
+    <div class="dh">
+      <span class="dn">日曜日</span>
+      <span class="dtopic">価値観｜2週目の締め</span>
+      <span class="dcta cn">note誘導</span>
+    </div>
+    <div class="posts">
+      <div class="post morning">
+        <div class="pm"><span class="pi">🌅</span><span class="pt">朝</span></div>
+        <span class="ptag tw">成功・回収</span>
+        <div class="txt">【今週の実践課題】
+
+誰かと話すとき
+「話したくなったら2秒待つ」
+
+2秒待つと
+相手がもう一言話し足す。
+
+その一言を拾って
+「それって、どういうこと？」
+と一つだけ聞く。
+
+この習慣を続けた結果。
+
+「次はいつ？」が向こうから先に来た。
+途切れがちだった関係が3年続いた。
+「昨日の話ずっと考えてた」が届いた。
+
+「今日、2秒待てたか？」
+
+週明けから試してみてください。</div>
+      </div>
+      <div class="post night">
+        <div class="pm"><span class="pi">🌙</span><span class="pt">夜</span></div>
+        <span class="ptag tv">価値観</span>
+        <div class="txt">2週間の話を一言でまとめると
+
+「変わった後の人生が変わる」
+
+孤独が消えた。
+自分を好きになれた。
+50代が楽しくなった。
+
+エスコートの話から始まって
+最終的には
+自分の人生の話になってた。
+
+失敗記録は
+回収記録にできる。
+
+それだけは
+体で知ってる。
+
+───
+noteで📖</div>
+        <span class="ci cn">▶ note</span>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /week2 -->
+
+
+<!-- ========== 3週目 ========== -->
+<div class="wsec">
+  <div class="whd">
+    <span class="wn" style="color:var(--text-sub)">03</span>
+    <div>
+      <div class="wt">3週目｜品格と、その先の人生</div>
+      <div class="ws">スタッフ・完璧主義・年齢・焦らない50代の人生｜バズ③</div>
+    </div>
+  </div>
+
+  <!-- 月 バズ③ -->
+  <div class="dc buzz">
+    <div class="dh">
+      <span class="dn">月曜日</span>
+      <span class="dtopic">🔥 バズ③｜いい人と芯のある男の完全比較</span>
+      <span class="dcta cb">スクショ保存狙い</span>
+    </div>
+    <div class="posts">
+      <div class="post full">
+        <div class="pm"><span class="pi">🌅</span><span class="pt">朝（全幅）</span></div>
+        <span class="ptag tb">バズ投稿</span>
+        <div class="btxt">「いい人」と「芯のある男」は全然違う。
+
+「物足りないんだよね」
+付き合ってた女性にそう言われて別れた。
+
+当時は意味がわからなかった。
+
+50代になってわかった。
+
+「いい人」がやること。
+・相手に合わせる
+・意見を言わない
+・波風を立てない
+・断れない
+→ 女性に「安心」される
+→ でも「惹かれ」られない
+
+「芯のある男」がやること。
+・自分の意見を言える
+・行きたくない場所は断れる
+・リードできる
+・軸がある
+→ 女性に「惹かれ」られる
+
+「いい人」をやめた結果。
+
+具体的な日程を向こうから提案してくるようになった。
+「また会いたい」が向こうから来るようになった。
+孤独が消えた。
+50代が楽しくなった。
+
+「いい人」をやめた日から
+俺の人生が変わった。
+
+やさしさと芯は両立できる。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 月 夜 -->
+  <div class="dc life-card">
+    <div class="dh">
+      <span class="dn">月曜日</span>
+      <span class="dtopic">変わった後の人生｜物足りないと言われてから10年</span>
+      <span class="dcta clife">人生の回収</span>
+    </div>
+    <div class="posts">
+      <div class="post full night">
+        <div class="pm"><span class="pi">🌙</span><span class="pt">夜</span></div>
+        <span class="ptag tl">変わった後の人生</span>
+        <div class="txt">「物足りないんだよね」
+と言われて別れたのは
+30代のころだった。
+
+あれから10年以上経った。
+
+今の俺は
+あの頃と何が変わったのか。
+
+変わったのは技術じゃなかった。
+
+「嫌われたくない」をやめた。
+自分の意見を言えるようになった。
+断れるようになった。
+
+そしたら変わった。
+
+向こうから来るようになった。
+「また会いたい」が先に届くようになった。
+
+そして何より
+自分を好きになれた。
+
+「物足りない男」だった俺が
+50代で初めて
+「自分で良かった」と思えるようになった。
+
+あの一言がなかったら
+変われなかったかもしれない。
+
+───
+LINEで🎁</div>
+        <span class="ci cl">▶ LINE</span>
+        <div class="life-after">
+          <div class="la-l">▶ 変わった後の人生</div>
+          <div class="la-t">「物足りない男」が「自分で良かった」と思えるようになった／50代で初めて自己肯定感を手に入れた</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 火 -->
+  <div class="dc">
+    <div class="dh">
+      <span class="dn">火曜日</span>
+      <span class="dtopic">成功・回収｜スタッフへの態度が変えた関係</span>
+      <span class="dcta cl">LINE誘導</span>
+    </div>
+    <div class="posts">
+      <div class="post morning">
+        <div class="pm"><span class="pi">🌅</span><span class="pt">朝</span></div>
+        <span class="ptag tw">成功・回収</span>
+        <div class="txt">料理にミスがあった夜がある。
+
+「大丈夫ですよ」と自然に言えた。
+
+変わったのは帰り道だった。
+
+俺からLINEを送る前に
+向こうから届いた。
+
+「今日、すごく良かった。また行こう」
+
+「また行こう」が向こうから来たのは
+初めてだった。
+
+3回で終わることが多かった関係が
+今も続いてる。
+
+相手への態度は演じられる。
+スタッフへの態度は素が出る。
+
+素の良さを見せられた男が
+長く選ばれる。
+
+───
+LINEで🎁</div>
+        <span class="ci cl">▶ LINE</span>
+        <div class="life-after">
+          <div class="la-l">▶ 変わった後の人生</div>
+          <div class="la-t">「また行こう」が向こうから来た／3回で終わってた関係が今も続いてる</div>
+        </div>
+      </div>
+      <div class="post night">
+        <div class="pm"><span class="pi">🌙</span><span class="pt">夜</span></div>
+        <span class="ptag tc">失敗→代償</span>
+        <div class="txt">料理が遅かったとき
+「まだですか」と少し強い口調で言ったことがある。
+
+悪気はなかった。
+
+でも隣にいた女性の表情が
+スッと変わった。
+
+食事は続いた。
+会話も続いた。
+
+でもその後、誘いへの返事が
+「その日は…」ばかりになった。
+
+失ったのはデートの機会じゃない。
+
+「この人の素はこういう人だ」
+という印象を、一瞬で確定させてしまった夜だった。
+
+───
+LINEで🎁</div>
+        <span class="ci cl">▶ LINE</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 水 -->
+  <div class="dc">
+    <div class="dh">
+      <span class="dn">水曜日</span>
+      <span class="dtopic">やや人生話｜部下より年上になった日</span>
+      <span class="dcta c0">余韻で終わる</span>
+    </div>
+    <div class="posts">
+      <div class="post morning">
+        <div class="pm"><span class="pi">🌅</span><span class="pt">朝</span></div>
+        <span class="ptag tc">失敗→代償</span>
+        <div class="txt">40代まで、弱みを見せるのが怖かった。
+
+知らないことを知ってるふりした。
+失敗したことを「大したことない」と流した。
+
+その結果、女性との会話はいつも表面的だった。
+
+「楽しかったよ」と言われる。
+でも深くならない。
+
+失ったのはデートの機会じゃない。
+
+「この人に本音を話せる」
+という関係になれる可能性だった。
+
+正直に話せるようになった日から
+会話の深さが変わった。
+
+───
+LINEで🎁</div>
+        <span class="ci cl">▶ LINE</span>
+      </div>
+      <div class="post night">
+        <div class="pm"><span class="pi">🌙</span><span class="pt">夜</span></div>
+        <span class="ptag ty">やや人生話</span>
+        <div class="txt">最近、職場で気づいたことがある。
+
+気がついたら
+周りが自分より年下ばかりになってた。
+
+会議で意見を言うとき
+昔は「正しいことを言わなきゃ」と焦ってた。
+
+今は「この人たちにとって何が必要か」
+を考えてから話すようになった。
+
+自分を見せることより
+場を整えることの方が
+自然になってきた。
+
+仕事でも、恋愛でも
+「主役は相手」に切り替わったとき
+不思議と自分の存在感が増した。
+
+50代、そういう切り替えができるようになった。</div>
+        <div class="yoin">いつの間にか、俺が一番年上になっていた。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 木 -->
+  <div class="dc life-card">
+    <div class="dh">
+      <span class="dn">木曜日</span>
+      <span class="dtopic">変わった後の人生｜焦らない50代の話</span>
+      <span class="dcta clife">人生の回収</span>
+    </div>
+    <div class="posts">
+      <div class="post morning">
+        <div class="pm"><span class="pi">🌅</span><span class="pt">朝</span></div>
+        <span class="ptag tl">変わった後の人生</span>
+        <div class="txt">50代になって
+モテようとするのをやめた。
+
+ガッツリしなくなった。
+承認を求めるのをやめた。
+「足りない」と思うのをやめた。
+
+そしたら変わった。
+
+向こうから来るようになった。
+半年間、毎週アプローチが来るようになった。
+「会いたい」が先に届くようになった。
+
+でもそれより大事なことが変わった。
+
+毎朝、起きるのが楽しくなった。
+
+以前は
+「今日も頑張らないと」が毎朝あった。
+
+今は
+「今日は誰に会えるかな」になった。
+
+焦らなくなったから
+人生が楽しくなった。
+
+これが50代の本当の答えだと思う。
+
+───
+noteで📖</div>
+        <span class="ci cn">▶ note</span>
+        <div class="life-after">
+          <div class="la-l">▶ 変わった後の人生</div>
+          <div class="la-t">「今日も頑張らないと」が「今日は誰に会えるかな」になった／毎朝起きるのが楽しくなった</div>
+        </div>
+      </div>
+      <div class="post night">
+        <div class="pm"><span class="pi">🌙</span><span class="pt">夜</span></div>
+        <span class="ptag tc">失敗→代償</span>
+        <div class="txt">40代のころ、年収を気にしてた。
+
+「もっと稼いでたら」
+「もっといいポジションだったら」
+
+女性と会うたびに
+どこかで比べてた。
+
+ある夜、一緒にいた女性が言った。
+
+「やや君って、なんか余裕なさそうに見える時がある」
+
+その後、その女性との関係が
+少しずつ薄くなった。
+
+失ったのは年収でも関係でもない。
+
+「自分で十分だ」という
+在り方だった。
+
+───
+noteで📖</div>
+        <span class="ci cn">▶ note</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 金 -->
+  <div class="dc">
+    <div class="dh">
+      <span class="dn">金曜日</span>
+      <span class="dtopic">成功・回収｜阿吽の呼吸と人生の深さ</span>
+      <span class="dcta cn">note誘導</span>
+    </div>
+    <div class="posts">
+      <div class="post morning">
+        <div class="pm"><span class="pi">🌅</span><span class="pt">朝</span></div>
+        <span class="ptag tw">成功・回収</span>
+        <div class="txt">年齢が近い女性と過ごすようになって
+初めて気づいたことがある。
+
+言葉がいらない瞬間がある。
+
+料理が来たとき
+視線を合わせるだけで伝わる。
+
+帰り際の空気が
+自然に切り替わる。
+
+次の日程が
+会話の中で自然に決まる。
+
+若い頃は「何か言わなきゃ」と焦ってた。
+
+50代で初めて
+「何も言わなくていい時間」
+の作り方を覚えた。
+
+それは関係の変化だけじゃなかった。
+
+「一緒にいて気持ちいい時間の作り方」を
+覚えた瞬間だった。
+
+───
+noteで📖</div>
+        <span class="ci cn">▶ note</span>
+        <div class="life-after">
+          <div class="la-l">▶ 変わった後の人生</div>
+          <div class="la-t">「一緒にいて気持ちいい時間の作り方」を覚えた／何も言わなくていい時間が生まれた</div>
+        </div>
+      </div>
+      <div class="post night">
+        <div class="pm"><span class="pi">🌙</span><span class="pt">夜</span></div>
+        <span class="ptag tw">成功・回収</span>
+        <div class="txt">40代のある夜、
+20代のころ好きだった女性に久しぶりに会った。
+
+彼女はすごく幸せそうだった。
+隣にいる男は
+特別イケメンでも高収入でもなかった。
+
+ただ、落ち着いてた。
+
+「あの頃の俺には、あの落ち着きがなかった」
+
+若さを武器にしようとして
+空回りしてた20代の自分を思い出した。
+
+あの夜から
+自分の年齢を
+コンプレックスじゃなく資産だと思うようにした。
+
+失敗から手に入れた厚みが
+今の俺の全てだ。
+
+───
+noteで📖</div>
+        <span class="ci cn">▶ note</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 土 -->
+  <div class="dc">
+    <div class="dh">
+      <span class="dn">土曜日</span>
+      <span class="dtopic">やや人生話｜体力の衰えと50代の豊かさ</span>
+      <span class="dcta c0">余韻で終わる</span>
+    </div>
+    <div class="posts">
+      <div class="post morning">
+        <div class="pm"><span class="pi">🌅</span><span class="pt">朝</span></div>
+        <span class="ptag tl">変わった後の人生</span>
+        <div class="txt">失敗記録は
+回収記録にできる。
+
+3週間、話してきたことは全部これだ。
+
+エレベーター、店選び、会計、別れ際、会話。
+
+どれも「温度の変化に気づいた」ことから始まった。
+
+でも本当に変わったのは
+エスコートの技術じゃなかった。
+
+孤独が消えた。
+自分を好きになれた。
+50代が楽しくなった。
+朝起きるのが楽しくなった。
+
+エレベーターの5秒から始まった
+人生の回収の話だった。</div>
+      </div>
+      <div class="post night">
+        <div class="pm"><span class="pi">🌙</span><span class="pt">夜</span></div>
+        <span class="ptag ty">やや人生話</span>
+        <div class="txt">最近、体力が落ちたと実感してる。
+
+久しぶりに走ってみたら
+500mで息が上がった。
+
+笑えた。
+
+でも不思議と悲しくない。
+
+体力が落ちた分
+「どこにエネルギーを使うか」を
+ちゃんと選ぶようになった。
+
+目の前の人に集中する。
+余計なことを考えない。
+余白を持って生きる。
+
+ガッツリできなくなったから
+大事なことだけ残ってる。
+
+50代、悪くない。
+
+むしろ今が一番、豊かかもしれない。</div>
+        <div class="yoin">500mで息が上がった夜、なぜか晴れやかだった。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 日 -->
+  <div class="dc">
+    <div class="dh">
+      <span class="dn">日曜日</span>
+      <span class="dtopic">価値観｜3週間の締め</span>
+      <span class="dcta cn">note誘導</span>
+    </div>
+    <div class="posts">
+      <div class="post morning">
+        <div class="pm"><span class="pi">🌅</span><span class="pt">朝</span></div>
+        <span class="ptag tw">成功・回収</span>
+        <div class="txt">【3週間の回収まとめ】
+
+変えたこと→変わった人生。
+
+① エレベーターで先に出す
+→ 3回→3年続く関係が生まれた
+
+② 「〇〇が好きって言ってたから」を使う
+→ 向こうから店を提案してくるようになった
+
+③ 話したくなったら2秒待つ
+→ 孤独が消えた
+
+④ 追いかけるのをやめた
+→ 朝起きるのが楽しくなった
+
+⑤ 弱みを見せた
+→ 自分を好きになれた
+
+全部「小さなこと」から始まった。
+でも全部「人生が変わった」こと。
+
+やってみてください。</div>
+      </div>
+      <div class="post night">
+        <div class="pm"><span class="pi">🌙</span><span class="pt">夜</span></div>
+        <span class="ptag tv">価値観</span>
+        <div class="txt">3週間、見てくれてありがとう。
+
+エレベーターの話から始めた。
+
+でも本当に伝えたかったのは
+エスコート術じゃなかった。
+
+孤独が消えた話。
+自分を好きになれた話。
+50代が楽しくなった話。
+朝起きるのが楽しくなった話。
+
+「50代で人生を回収した男の記録」
+
+それを伝えたくて
+発信してる。
+
+変わるのに年齢は関係ない。
+来週も続けます。
+
+───
+3週間の内容まとめ、noteで📖</div>
+        <span class="ci cn">▶ note</span>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /week3 -->
+</main>
+
+<footer>
+  やや＠大人の女性攻略【エスコート】⭐令和のイケオジ熟　X投稿カレンダー 1〜3週目 v10 FINAL
+</footer>
+</body>
+</html>
